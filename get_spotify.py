@@ -1,0 +1,84 @@
+import requests
+import json
+from urllib.parse import urlparse
+
+base_url = "https://api.spotify.com/v1"
+playlist_tracks = []
+
+def get_client_info():
+    try:
+        with open("client_info.json", 'r') as f:
+            data = json.load(f)
+            client_id = data['client_id']
+            client_secret = data['client_secret']
+    
+    except FileNotFoundError:
+        with open("client_info.json", 'w') as f:
+            client_id = input('Enter client ID: ')
+            client_secret = input("Enter client secret: ")
+            secrets = {
+                'client_id': client_id,
+                'client_secret': client_secret
+            }
+            json.dump(secrets, f)
+
+    return client_id, client_secret
+
+def get_spotify_access_token(client_id, client_secret):
+    url = 'https://accounts.spotify.com/api/token'
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": client_secret
+    }
+    
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    return response.json()['access_token']
+
+def get_playlist_info():
+    playlist_url = fr'{base_url}/playlists/{playlist_id}/tracks'
+    print(f"Checking: {playlist_url}...\n")
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    response = requests.get(playlist_url, headers=headers)
+    if response.ok:
+        data = response.json()
+    else:
+        print("Error:", response.status_code, response.text)
+        return
+
+    for item in data['items']:       
+        track = item['track']
+        track_name = track['name']
+
+        if item['is_local']:
+            # print("Skipping local track: ", track_name)
+            continue
+
+        track_ISRC = track['external_ids']['isrc']
+        track_artist_names = []
+        for artist in track['artists']:
+            track_artist_names.append(artist['name'])
+
+        # print(f"Got: {', '.join(track_artist_names)} - '{track_name}', with ISRC {track_ISRC}...")
+        playlist_tracks.append({'Name': track_name, 
+        'Artists': ', '.join(track_artist_names), 
+        'ISRC': track_ISRC})
+
+def main():
+    global playlist_id, access_token
+    playlist_url = input("Enter the spotify playlist URL: ")
+    path = urlparse(playlist_url).path
+    playlist_id = path.split('/')[-1]
+
+    client_id, client_secret = get_client_info()
+    access_token = get_spotify_access_token(client_id, client_secret)
+    get_playlist_info()
+
+    return playlist_tracks
