@@ -1,10 +1,12 @@
 import os
 import subprocess
 import json
+from urllib.parse import urlparse, parse_qs
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+import googleapiclient.errors
 
 SCOPES = ["https://www.googleapis.com/auth/youtube"]
 CACHE_FILE = "yt_id_cache.json"
@@ -77,15 +79,120 @@ def get_youtube_id(playlist_tracks): # Uses yt-dlp to get a lot of metadata then
     save_cache(cache)
     return playlist_tracks
 
+def create_playlist(): # Creates a playlist using YouTube API
+    while True:
+            title = input("Enter your playlist's name (max 150 chars): ")
+            if 0 < len(title) <= 150:
+                break
+            print("Error: Title must be 1-150 characters long. Please try again.")
+
+    while True:
+        description = input("Enter your playlist's description (max 5000 chars): ")
+        if len(description) <= 5000:
+            break
+        print("Error: Description must be 0-5000 characters long. Please try again.")
+
+    valid_visibilities = {"priv": "private", "pub": "public", "unl": "unlisted"}
+    while True:
+        visibility_input = input("Enter playlist visibility ['priv']ate, ['pub']lic, ['unl']isted: ").lower()
+        if visibility_input in valid_visibilities:
+            visibility = valid_visibilities[visibility_input]
+            break
+        print("Error: Invalid visibility option. Please enter 'priv', 'pub', or 'unl'.")
+
+    request = youtube.playlists().insert(
+        part="snippet,status",
+        body={
+          "snippet": {
+            "title": title,
+            "description": description,
+            "defaultLanguage": "en"
+          },
+          "status": {
+            "privacyStatus": visibility
+          }
+        }
+    )
+
+    try:
+        response = request.execute()
+        print("Playlist created successfully!")
+    except Exception as e:
+        print("API Error:", e)
+
+    return response['id']
+
+def select_playlist(): # Lists the playlist using the YouTube API or lets the user enter the URL manually
+    while True:
+        choice = input("Do you want to list playlist 'man'ually or with 'yt-api' (automatic, uses 1 unit)?: ").strip().lower()
+        
+        if choice == 'yt-api':
+            request = youtube.playlists().list(
+                part="snippet,contentDetails",
+                maxResults=25,
+                mine=True
+            )
+            response = request.execute()
+
+            playlists = response.get("items", [])
+            if not playlists:
+                print("No playlists found.")
+                return None
+
+            print("\nYour playlists:")
+            for i, playlist in enumerate(playlists, 1):
+                title = playlist['snippet']['title']
+                count = playlist['contentDetails']['itemCount']
+                print(f"{i}. {title} ({count} videos)")
+         
+            while True:
+                try:
+                    selection = int(input("\nSelect a playlist number: "))
+                    if 1 <= selection <= len(playlists):
+                        playlist_id = playlists[selection - 1]['id']
+                        return playlist_id
+                    else:
+                        print("Invalid number. Try again.")
+                except ValueError:
+                    print("Please enter a valid number.")
+        
+        elif choice == 'man':
+            playlist_url = input("Enter the playlist URL: ").strip()
+            try:
+                playlist_id = parse_qs(urlparse(playlist_url).query)["list"][0]
+                return playlist_id
+            except Exception as e:
+                print("Invalid URL. Please try again.")
+        
+        else:
+            print("Wrong input! Choose only 'man' or 'yt-api'")
+
 def main(playlist_tracks):
+    global youtube
+    print("Authenticating...")
     youtube = get_authenticated_youtube()
     print("Authentication successful!")
 
     print("Working on getting the songs...")
     playlist_tracks = get_youtube_id(playlist_tracks)
-    print(playlist_tracks)
+
+    while True:
+        response = input("Create a new playlist ['1'] or choose an existing one? ['2']: ").strip().lower()
+        if response == '1':
+            print("Creating playlist...")
+            playlist_id = create_playlist()
+            break
+        if response == '2':
+            playlist_id = select_playlist()
+            print(playlist_id)
+            break
+        else:
+            print("Invalid input! Choose only ['1'] or ['2']")
+
+    print("Adding the tracks to the playlist...")
+
+
 
 # TO DO:
-# Create playlist
 # Update playlist with videos using video url
-# Edit playlist name ect.
+# Create multiple google project's automatically or something

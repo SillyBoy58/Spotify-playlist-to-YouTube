@@ -40,4 +40,4 @@ REQUIREMENTS:
 1. Accuracy might not be 100% with locally added songs.
 2. ISRC (International Standard Recording Code):
     This is a unique identifier used by music distributors (like DistroKid, Vevo, etc.) when uploading tracks. It allows accurate cross-platform identification of songs - YouTube and Spotify included - by matching this metadata.
-3. Rate-limitless excluding your YouTube Data API limits (10,000 units per day if using the free plan), which is unfortunately unavoidable. [See more](https://developers.google.com/youtube/v3/determine_quota_cost)
+3. Rate-limitless excluding your YouTube Data API limits (10,000 units per day if using the free plan a.k.a. 199 tracks transfered (199*50 units) + a created playlist (50 units) or 200 songs with a selected playlist), which is unfortunately unavoidable. [See more](https://developers.google.com/youtube/v3/determine_quota_cost)
