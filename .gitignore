@@ -1,3 +1,6 @@
 __pycache__
 venv
-client_info.json
+Spotify_client_info.json
+YouTube_client_info.json
+token.json
+test_playlist.txt

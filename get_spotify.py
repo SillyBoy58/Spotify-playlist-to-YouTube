@@ -7,15 +7,15 @@ playlist_tracks = []
 
 def get_client_info():
     try:
-        with open("client_info.json", 'r') as f:
+        with open("Spotify_client_info.json", 'r') as f:
             data = json.load(f)
             client_id = data['client_id']
             client_secret = data['client_secret']
     
     except FileNotFoundError:
-        with open("client_info.json", 'w') as f:
-            client_id = input('Enter client ID: ')
-            client_secret = input("Enter client secret: ")
+        with open("Spotify_client_info.json", 'w') as f:
+            client_id = input('Enter Spotify App client ID: ')
+            client_secret = input("Enter Spotify App client secret: ")
             secrets = {
                 'client_id': client_id,
                 'client_secret': client_secret
