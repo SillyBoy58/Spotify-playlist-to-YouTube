@@ -53,12 +53,27 @@ def get_playlist_info():
         print("Error:", response.status_code, response.text)
         return
 
+    while True:
+        response = input("Do you want to also try fetching local tracks? (Results might not be accurate) ['y', 'n']: ")
+        if response == 'y':
+            get_local_tracks = True
+            break
+        elif response == 'n':
+            get_local_tracks = False
+            break
+        else:
+            print("Wrong input! Type 'y' or 'n' only!")
+
     for item in data['items']:       
         track = item['track']
         track_name = track['name']
 
         if item['is_local']:
-            # print("Skipping local track: ", track_name)
+            if get_local_tracks:
+                playlist_tracks.append({
+                    'Name': track_name,
+                    'Status': 'local'
+                })
             continue
 
         track_ISRC = track['external_ids']['isrc']
@@ -67,9 +82,12 @@ def get_playlist_info():
             track_artist_names.append(artist['name'])
 
         # print(f"Got: {', '.join(track_artist_names)} - '{track_name}', with ISRC {track_ISRC}...")
-        playlist_tracks.append({'Name': track_name, 
-        'Artists': ', '.join(track_artist_names), 
-        'ISRC': track_ISRC})
+        playlist_tracks.append({
+            'Name': track_name, 
+            'Artists': ', '.join(track_artist_names), 
+            'ISRC': track_ISRC,
+            'Status': 'online'
+        })
 
 def main():
     global playlist_id, access_token

@@ -11,6 +11,8 @@ NO FEES OR SUBSCRIPTIONS: Self-hosted, so there's nothing to pay.
 
 NO SPOTIFY LOGINS REQUIRED: Transfers from public playlists only, so your account credentials stay private.
 
+FULLY OPEN-SOURCE: duh :rolling_eyes:
+
 CONS:
 
 No music videos: Transfers typically link to audio tracks, not official music videos.
