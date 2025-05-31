@@ -6,8 +6,8 @@ Still using:
 USE THIS INSTEAD 😎😎😎😎😎😎
 
 PROS:
-    100% ACCURATE: Uses ISRC codes* to match tracks precisely (local songs may vary). 🤯🤯🤯🤯🤯🤯
-    NO LIMITS: Everything runs locally on your system, no usage caps. (excluding your YouTube Data API limits(10,000 per day if using the free plan))😲😲😲😲😲😲
+    *100% ACCURATE: Uses ISRC codes to match tracks precisely (local songs may vary). 🤯🤯🤯🤯🤯🤯
+    *NO LIMITS: Everything runs locally on your system, no usage caps.😲😲😲😲😲😲
     NO FEES OR SUBSCRIPTIONS: Self-hosted, so there's nothing to pay. 💯💯💯💰💰💰💸💸💸🤑
     NO SPOTIFY LOGINS REQUIRED: Transfers from public playlists only, so your account credentials stay private. 😱😱😱😱😱😱
     FULLY OPEN-SOURCE: duh 🙄🙄🙄🙄🙄🙄
@@ -32,9 +32,12 @@ REQUIREMENTS:
         3.8. Place it in the same directory as 'main.py'
         3.9. Make sure to add the google account (from which you will be transfering the YouTube playlist) to the Test users list (which is in APIs & Services > Credentials > OAuth 2.0 Client IDs > Audience > Test users > + Add users > Type in the gmail)
     4. All of the required Python libraries installed (pip install <library>)
+    5. [yt-dlp](https://github.com/yt-dlp/yt-dlp) - I could've used the official YouTube API for search queries and it would be much faster, but I didn't to use up less units
 
 🟥 !!!! DO NOT SHARE YOUR "token.json", "Spotify_client_info.json" or "YouTube_client_info.json" UNLESS YOU 100% TRUST THE PERSON YOURE SENDING IT TO !!!! 🟥
 
 *
-ISRC (International Standard Recording Code):
+1. Accuracy might not be 100% with locally added songs.
+2. ISRC (International Standard Recording Code):
     This is a unique identifier used by music distributors (like DistroKid, Vevo, etc.) when uploading tracks. It allows accurate cross-platform identification of songs - YouTube and Spotify included - by matching this metadata.
+3. Rate-limitless excluding your YouTube Data API limits (10,000 units per day if using the free plan), which is unfortunately unavoidable. [See more](https://developers.google.com/youtube/v3/determine_quota_cost)

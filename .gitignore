@@ -3,4 +3,5 @@ venv
 Spotify_client_info.json
 YouTube_client_info.json
 token.json
+yt_id_cache.json
 test_playlist.txt

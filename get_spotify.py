@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 base_url = "https://api.spotify.com/v1"
 playlist_tracks = []
 
-def get_client_info():
+def get_client_info(): # Asks the user to input the Spotify App IDs
     try:
         with open("Spotify_client_info.json", 'r') as f:
             data = json.load(f)
@@ -24,7 +24,7 @@ def get_client_info():
 
     return client_id, client_secret
 
-def get_spotify_access_token(client_id, client_secret):
+def get_spotify_access_token(client_id, client_secret): # Gets the access token
     url = 'https://accounts.spotify.com/api/token'
     headers = {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -39,9 +39,9 @@ def get_spotify_access_token(client_id, client_secret):
     response.raise_for_status()
     return response.json()['access_token']
 
-def get_playlist_info():
+def get_playlist_info(): # Gets playlist_tracks
     playlist_url = fr'{base_url}/playlists/{playlist_id}/tracks'
-    print(f"Checking: {playlist_url}...\n")
+    print(f"Checking: {playlist_url}...")
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
