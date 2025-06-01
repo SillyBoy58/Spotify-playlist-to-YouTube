@@ -52,28 +52,49 @@ def get_youtube_id(playlist_tracks): # Uses yt-dlp to get a lot of metadata then
 
     with YoutubeDL(ydl_opts) as ydl:
         for track in playlist_tracks:
-            query = track.get('ISRC') or track.get('Name', '')
-            if not query:
-                track['Video_ID'] = None
-                continue
+            fallback_query = ''
+            if 'Artists' in track and 'Name' in track:
+                fallback_query = f"{track['Artists']} {track['Name']}"
 
-            if query in cache:
-                track['Video_ID'] = cache[query]
-                continue
-            
-            safe_query = query.replace('"', '\\"')
-            try:
-                result = ydl.extract_info(f'ytsearch1:"{safe_query}"', download=False)
-                entries = result['entries'] if 'entries' in result else []
-                video_id = entries[0]['id'] if entries else None
-            except Exception as e:
-                print(f"[yt-dlp error] {query}: {e}")
-                video_id = None
+            video_id = None
+
+            if 'ISRC' in track and track['ISRC']:
+                isrc_query = track['ISRC']
+
+                if isrc_query in cache:
+                    video_id = cache[isrc_query]
+                else:
+                    try:
+                        result = ydl.extract_info(f'ytsearch1:"{isrc_query}"', download=False)
+                        entries = result.get('entries', [])
+                        video_id = entries[0]['id'] if entries else None
+                    except Exception as e:
+                        print(f"[yt-dlp error] ISRC search '{isrc_query}': {e}")
+                        video_id = None
+
+                    cache[isrc_query] = video_id
+
+            if video_id is None and fallback_query:
+                if fallback_query in cache:
+                    video_id = cache[fallback_query]
+                else:
+                    try:
+                        result = ydl.extract_info(f'ytsearch1:"{fallback_query}"', download=False)
+                        entries = result.get('entries', [])
+                        video_id = entries[0]['id'] if entries else None
+                    except Exception as e:
+                        print(f"[yt-dlp error] Fallback search '{fallback_query}': {e}")
+                        video_id = None
+
+                    cache[fallback_query] = video_id
 
             track['Video_ID'] = video_id
-            cache[query] = video_id
-            print(f"Fetched '{track['Name']}' → https://www.youtube.com/watch?v={video_id}" if video_id else f"🔴🔴 Failed to find video for '{query}' 🔴🔴")
-            
+
+            if video_id:
+                print(f"Found video for '{track.get('Name', 'Unknown')}': https://www.youtube.com/watch?v={video_id}")
+            else:
+                print(f"🔴 No video found for '{track.get('Name', 'Unknown')}'")
+
     save_cache(cache)
     return playlist_tracks
 
@@ -228,6 +249,4 @@ def main(playlist_tracks):
 
 
 # TO DO:
-
-# Update playlist with videos using video url || DONE NOT TESTED
 # Create multiple google project's automatically or something

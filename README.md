@@ -35,7 +35,7 @@ Still using:
    Or use my short-hand version:  
    - Go to [Google Cloud Console](https://console.developers.google.com)  
    - Create a new project (or use an existing one)  
-   - Enable the YouTube Data API v3  
+   - APIs & Services -> Enable the YouTube Data API v3  
    - Go to APIs & Services > Credentials  
    - Create OAuth 2.0 Client ID (choose Desktop App)  
    - Download the `client_secret_XXX.json` file  
