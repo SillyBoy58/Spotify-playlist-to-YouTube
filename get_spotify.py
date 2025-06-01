@@ -98,5 +98,6 @@ def main():
     client_id, client_secret = get_client_info()
     access_token = get_spotify_access_token(client_id, client_secret)
     get_playlist_info()
+    print("Fetched all of the tracks successfully!")
 
     return playlist_tracks

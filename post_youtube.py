@@ -1,5 +1,5 @@
 import os
-import subprocess
+from yt_dlp import YoutubeDL
 import json
 from urllib.parse import urlparse, parse_qs
 
@@ -41,41 +41,37 @@ def save_cache(cache):
 def get_youtube_id(playlist_tracks): # Uses yt-dlp to get a lot of metadata then uses jq to process the json
     cache = load_cache()
 
-    for playlist_track in playlist_tracks:
-        track_ISRC = playlist_track.get('ISRC')
-        if track_ISRC:
-            query = track_ISRC
-        else:
-            track_name = playlist_track.get('Name', '')
-            if not track_name.strip():
-                playlist_track['Video_ID'] = None
+    ydl_opts = {
+        'quiet': True,
+        'skip_download': True,
+        'extract_flat': True,
+        'forcejson': True,
+    }
+
+    with YoutubeDL(ydl_opts) as ydl:
+        for track in playlist_tracks:
+            query = track.get('ISRC') or track.get('Name', '')
+            if not query:
+                track['Video_ID'] = None
                 continue
-            query = track_name
 
-        if query in cache:
-            playlist_track['Video_ID'] = cache[query]
-            continue
+            if query in cache:
+                track['Video_ID'] = cache[query]
+                continue
+            
+            safe_query = query.replace('"', '\\"')
+            try:
+                result = ydl.extract_info(f"ytsearch1:{query}", download=False)
+                entries = result['entries'] if 'entries' in result else []
+                video_id = entries[0]['id'] if entries else None
+            except Exception as e:
+                print(f"[yt-dlp error] {query}: {e}")
+                video_id = None
 
-        safe_query = query.replace('"', '\\"')
-        cmd = [
-            "yt-dlp",
-            f'ytsearch1:"{safe_query}"',
-            "--skip-download",
-            "--no-warnings",
-            "--quiet",
-            "--print", "id"
-        ]
-
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            video_id = None
-        else:
-            video_id = result.stdout.strip() or None
-
-        playlist_track['Video_ID'] = video_id
-        cache[query] = video_id
-        print(f"Fetched {playlist_track['Name']}. Video url: https://www.youtube.com/watch?v={video_id}")
-        
+            track['Video_ID'] = video_id
+            cache[query] = video_id
+            print(f"Fetched '{query}' → https://www.youtube.com/watch?v={video_id}" if video_id else f"🔴🔴 Failed to find video for '{query}' 🔴🔴")
+            
     save_cache(cache)
     return playlist_tracks
 
@@ -173,7 +169,7 @@ def main(playlist_tracks):
     youtube = get_authenticated_youtube()
     print("Authentication successful!")
 
-    print("Working on getting the songs...")
+    print("Working on getting the songs' video IDs...")
     playlist_tracks = get_youtube_id(playlist_tracks)
 
     while True:
@@ -184,7 +180,6 @@ def main(playlist_tracks):
             break
         if response == '2':
             playlist_id = select_playlist()
-            print(playlist_id)
             break
         else:
             print("Invalid input! Choose only ['1'] or ['2']")
@@ -194,5 +189,7 @@ def main(playlist_tracks):
 
 
 # TO DO:
+
+# Use yt-dlp and not subprocess
 # Update playlist with videos using video url
 # Create multiple google project's automatically or something
