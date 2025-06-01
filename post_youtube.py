@@ -45,7 +45,6 @@ def get_youtube_id(playlist_tracks): # Uses yt-dlp to get a lot of metadata then
         'quiet': True,
         'skip_download': True,
         'extract_flat': True,
-        'forcejson': True,
     }
 
     with YoutubeDL(ydl_opts) as ydl:
@@ -61,7 +60,7 @@ def get_youtube_id(playlist_tracks): # Uses yt-dlp to get a lot of metadata then
             
             safe_query = query.replace('"', '\\"')
             try:
-                result = ydl.extract_info(f"ytsearch1:{query}", download=False)
+                result = ydl.extract_info(f'ytsearch1:"{safe_query}"', download=False)
                 entries = result['entries'] if 'entries' in result else []
                 video_id = entries[0]['id'] if entries else None
             except Exception as e:
@@ -70,7 +69,7 @@ def get_youtube_id(playlist_tracks): # Uses yt-dlp to get a lot of metadata then
 
             track['Video_ID'] = video_id
             cache[query] = video_id
-            print(f"Fetched '{query}' → https://www.youtube.com/watch?v={video_id}" if video_id else f"🔴🔴 Failed to find video for '{query}' 🔴🔴")
+            print(f"Fetched '{track['Name']}' → https://www.youtube.com/watch?v={video_id}" if video_id else f"🔴🔴 Failed to find video for '{query}' 🔴🔴")
             
     save_cache(cache)
     return playlist_tracks

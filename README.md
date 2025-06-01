@@ -8,9 +8,10 @@ USE THIS INSTEAD 😎😎😎😎😎😎
 PROS:
     *100% ACCURATE: Uses ISRC codes to match tracks precisely (local songs may vary). 🤯🤯🤯🤯🤯🤯
     *NO LIMITS: Everything runs locally on your system, no usage caps.😲😲😲😲😲😲
-    NO FEES OR SUBSCRIPTIONS: Self-hosted, so there's nothing to pay. 💯💯💯💰💰💰💸💸💸🤑
+    NO FEES OR SUBSCRIPTIONS: Self-hosted, so there's nothing to pay. 💯💯💯💰💰💰💸💸💸
     NO SPOTIFY LOGINS REQUIRED: Transfers from public playlists only, so your account credentials stay private. 😱😱😱😱😱😱
     FULLY OPEN-SOURCE: duh 🙄🙄🙄🙄🙄🙄
+    CACHES YOUTUBE VIDEO IDs: If a song you want to transfer has already been transfered before it doesn't fetch it again, rather uses the local result.
 
 CONS:
     No music videos: Transfers typically link to audio tracks, not official music videos.
