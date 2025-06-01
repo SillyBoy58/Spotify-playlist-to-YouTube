@@ -1,5 +1,6 @@
 __pycache__
 venv
+client infos
 Spotify_client_info.json
 YouTube_client_info.json
 token.json

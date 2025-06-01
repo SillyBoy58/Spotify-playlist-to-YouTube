@@ -2,18 +2,12 @@ import get_spotify
 import post_youtube
 
 def main():
-    while True:
-        playlist_tracks = get_spotify.main()
-        post_youtube.main(playlist_tracks)
-
-        while True:
-            response = input("Do you want to transfer another playlist? ['y', 'n']: ").lower().strip()
-            if response == 'y':
-                break
-            elif response == 'n':
-                return
-            else:
-                print("Wrong input! Type 'y' or 'n' only!")
+    playlist_tracks = get_spotify.main()
+    response = post_youtube.main(playlist_tracks)
+    if response == 69420:
+        print("A little boo boo happened in the code and now your playlist is lost into the abyss ;(")
+    else:
+        print("Congratulations on successfully transfering your playlist!")
 
 if __name__ == "__main__":
     main()
